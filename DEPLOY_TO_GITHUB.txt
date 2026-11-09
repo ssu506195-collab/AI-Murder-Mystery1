@@ -1,0 +1,10 @@
+《紙妻》GitHub Pages V5.0
+
+1. 先部署 Paper_Wife_Cloudflare_Worker_V5.0.zip 內的 Worker，建立 KV 並填入 wrangler.toml 的 namespace ID。
+2. 解壓本 GitHub Pages ZIP，將根目錄內所有檔案/資料夾直接放入 GitHub Repository 根目錄，index.html 不可多包一層。
+3. GitHub Repository > Settings > Pages > Deploy from a branch > main > /(root)。
+4. 開啟網站，右上角齒輪貼上 Worker 網址並測試連線。
+5. 免 Token 固定選項模式不需要 Groq Key；Token 自由對話模式才需要自己的 Groq Key。
+
+注意：不要把 Cloudflare Worker 的 src/private-data.js、Worker ZIP 或原始角色劇本上傳到公開 GitHub。所有私有角色資料與分批線索都由 Worker 保管。
+詳細步驟請閱讀 README.md。
