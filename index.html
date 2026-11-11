@@ -1,233 +1,90 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#100e0c">
-  <meta name="description" content="《紙妻》民國懸疑互動劇本：七位角色、四幕故事、公開調查與最終投票。">
-  <title>紙妻｜民國懸疑互動劇本</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./style.css?v=5.0-paperwife-private-worker">
+  <meta name="description" content="《紙妻》民國懸疑互動劇本殺：序章、人物介紹與固定分支公開問答。">
+  <title>《紙妻》｜民國懸疑互動劇本殺</title>
+  <link rel="stylesheet" href="styles.css?v=0.2.0">
 </head>
 <body>
   <div class="grain"></div>
-  <header class="topbar">
-    <a class="brand" href="#" id="brandHome" aria-label="回到首頁">
-      <span class="brand-mark">M</span>
-      <span><b>MYSTERY ROOM</b><small>民國懸疑互動劇本｜紙妻</small></span>
-    </a>
-    <div class="topbar-right">
-      <span class="version-badge">V5.0｜紙妻專案</span><span id="modeBadge" class="mode-badge">尚未開始</span>
-      <span id="tokenBadge" class="token-badge">TOKEN 0</span>
-      <button id="openJournalTopBtn" class="icon-btn journal-top-btn" title="我的劇本與筆記" hidden>📖</button>
-      <button id="settingsBtn" class="icon-btn" title="遊戲設定">⚙</button>
-    </div>
-  </header>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="紙妻首頁"><span class="brand-seal">紙</span><span><strong>紙妻</strong><small>THE PAPER BRIDE · CASE 001</small></span></a>
+      <div class="top-status"><span class="status-dot"></span><span id="connectionStatusText">正在連接陳宅檔案室…</span></div>
+      <div class="chapter-track"><span class="track-active">序章</span><i></i><span>第一幕</span><i></i><span class="track-muted">後續調查</span></div>
+    </header>
 
-  <main>
-    <!-- HOME / CASE SELECT -->
-    <section id="homeScreen" class="screen active">
-      <div class="home-hero" id="homeHero">
-        <div class="hero-copy">
-          <div class="eyebrow">A STORY BUILT ON SECRETS</div>
-          <h1>每個人都有秘密。<br><em>但只有一個人是兇手。</em></h1>
-          <p>你將成為案件中的其中一名角色。六位涉案角色各自握有不同記憶、秘密與目的。公開問答、互相質疑，最後找出真相——或設法不被發現。</p>
-          <div class="hero-tags"><span>沉浸式視覺小說</span><span>多角色互動</span><span>公開推理與投票</span></div>
-        </div>
-        <div class="hero-bottom-note"><span class="pulse-dot"></span> THE TRUTH IS NEVER WHAT IT SEEMS</div>
-      </div>
-
-      <section class="case-select-section">
-        <div class="section-title-row">
-          <div><div class="eyebrow">CHOOSE YOUR CASE</div><h2>選擇劇本</h2><p class="muted">以《紙妻》七人案件為主，包含序章、四幕調查、投票與真相揭曉。</p></div>
-          <div class="case-count"><b id="caseCount">01</b><span>AVAILABLE CASES</span></div>
-        </div>
-        <div id="caseGrid" class="case-grid"></div>
-      </section>
-      <footer class="site-footer"><span>紙妻 · 民國懸疑互動劇本</span><span>清河陳宅｜七位角色 · 四幕故事</span></footer>
-    </section>
-
-    <!-- SETTINGS MODAL -->
-    <div id="settingsModal" class="modal-backdrop" hidden>
-      <div class="modal settings-modal">
-        <button class="modal-close" id="closeSettings">×</button>
-        <div class="eyebrow">GAME MODE</div>
-        <h2>遊戲模式設定</h2>
-        <div class="mode-switch">
-          <label class="mode-option"><input type="radio" name="gameMode" value="demo" checked><span><b>免 Token 固定選項模式</b><small>每位角色有三個主問題及兩層固定追問，不消耗 Token</small></span></label>
-          <label class="mode-option"><input type="radio" name="gameMode" value="groq"><span><b>Token 自由對話模式</b><small>使用自己的 Groq API Key，自由輸入與角色對話</small></span></label>
-        </div>
-        <div class="worker-fields">
-          <label for="workerUrl">Cloudflare Worker 網址（兩種模式都需要）</label>
-          <input id="workerUrl" type="url" placeholder="https://your-worker.your-subdomain.workers.dev">
-          <button id="testWorkerBtn" class="secondary-btn full">測試 Worker 連線</button>
-          <div id="workerStatus" class="connection-status" aria-live="polite">尚未測試連線</div>
-        </div>
-        <div id="groqFields" class="groq-fields" hidden>
-          <label for="groqKey">你的 Groq API Key</label>
-          <input id="groqKey" type="password" autocomplete="off" placeholder="gsk_...">
-          <label for="modelSelect">模型</label>
-          <select id="modelSelect"><option value="openai/gpt-oss-20b">openai/gpt-oss-20b（建議）</option><option value="openai/gpt-oss-120b">openai/gpt-oss-120b</option></select>
-          <div class="security-note"><b>金鑰使用說明</b><br>金鑰只保存在目前頁面的記憶體中，重新整理後需重新輸入。呼叫時會透過 HTTPS 傳給你自行部署的 Cloudflare Worker，再轉送 Groq；本專案程式不會寫入或保存金鑰。請只對自己信任的 Worker 網址輸入 Key。</div>
-          <button id="testApiBtn" class="secondary-btn full">測試 Groq API 連線</button>
-          <div id="connectionStatus" class="connection-status" aria-live="polite">尚未測試 Groq 連線</div>
-        </div>
-        <div class="modal-actions"><button id="saveSettingsBtn" class="gold-btn">儲存設定</button></div>
-        <p class="tiny-disclaimer">重要：兩種模式的角色私有資料、固定問答與真相都保存在 Cloudflare Worker，不放進公開 GitHub Pages。免 Token 模式仍需要 Worker，但不呼叫 Groq、不消耗模型 Token；Token 模式則另外需要 Groq API Key。瀏覽器端不會保存 API Key。</p>
-      </div>
-    </div>
-
-    <!-- PLAYER JOURNAL -->
-    <div id="journalModal" class="modal-backdrop" hidden>
-      <div class="modal journal-modal">
-        <button class="modal-close" id="closeJournal">×</button>
-        <div class="eyebrow">YOUR PRIVATE JOURNAL</div>
-        <h2 id="journalTitle">我的劇本與調查筆記</h2>
-        <div class="journal-tabs" role="tablist">
-          <button class="journal-tab active" data-journal-tab="story">我的角色劇本</button>
-          <button class="journal-tab" data-journal-tab="known">我知道的事</button>
-          <button class="journal-tab" data-journal-tab="clues">公開線索</button>
-          <button class="journal-tab" data-journal-tab="log">公開紀錄</button>
-        </div>
-        <div id="journalContent" class="journal-content"></div>
-      </div>
-    </div>
-
-    <!-- ROLE DRAW MODAL -->
-    <div id="roleModal" class="modal-backdrop" hidden>
-      <div class="modal role-modal">
-        <button class="modal-close" id="closeRole">×</button>
-        <div class="eyebrow">YOUR SECRET IDENTITY</div>
-        <h2>決定你的角色</h2>
-        <p class="muted">你將成為七名涉案者之一。每位角色都有自己的秘密、任務與故事。若抽中兇手，請保護自己的秘密並避免被其他人投票指認。</p>
-        <div class="draw-options">
-          <label><input type="radio" name="roleMode" value="random" checked> 隨機抽選角色</label>
-          <label><input type="radio" name="roleMode" value="choose"> 自行選擇角色（測試用）</label>
-        </div>
-        <div id="roleChoices" class="role-choice-grid" hidden></div>
-        <button id="confirmRoleBtn" class="gold-btn full">抽取我的角色</button>
-        <div id="myRoleCard" class="my-role-card" hidden></div>
-        <button id="enterStoryBtn" class="gold-btn full" hidden>進入案件現場 →</button>
-      </div>
-    </div>
-
-    <!-- PROLOGUE / TYPEWRITER -->
-    <section id="prologueScreen" class="screen scene-screen" hidden>
-      <div class="scene-bg" id="prologueBg"></div><div class="scene-vignette"></div>
-      <div class="scene-topline"><span id="prologueCaseName">紙妻｜CASE 001</span><span>PROLOGUE · 案件序章</span></div>
-      <div class="narration-box">
-        <div class="narration-label"><span class="small-gold-line"></span> 旁白 · NARRATOR</div>
-        <p id="narrationText" class="type-text"></p>
-        <div class="narration-bottom"><span id="narrationProgress">01 / 04</span><button id="nextNarrationBtn" class="text-next" disabled>繼續 <b>→</b></button></div>
-      </div>
-      <div class="scene-caption" id="sceneCaption">霧港山莊・書房</div>
-    </section>
-
-    <!-- CHARACTER INTRO -->
-    <section id="introScreen" class="screen character-screen" hidden>
-      <div class="scene-bg intro-bg" id="introBg"></div><div class="scene-vignette"></div>
-      <div class="intro-header"><div class="eyebrow">THE PEOPLE IN THIS ROOM</div><h2>在場人物</h2><p>在開始調查之前，先認識每一位與死者有關的人。</p></div>
-      <div class="intro-stage">
-        <div class="intro-portrait-wrap"><div class="portrait-aura"></div><img id="activePortrait" src="" alt="角色立繪"><div class="portrait-number" id="portraitNumber">01</div></div>
-        <div class="intro-dialogue">
-          <div class="character-kicker" id="characterKicker">CHARACTER INTRODUCTION</div>
-          <h3 id="activeName">角色姓名</h3><div class="character-occupation" id="activeOccupation">角色身分</div>
-          <p id="activeRelation" class="character-relation"></p>
-          <div id="activeStageAction" class="active-stage-action"></div>
-          <div id="introTypeText" class="intro-type-text"></div>
-          <div class="intro-controls"><span id="introCount">01 / 07</span><button id="nextCharacterBtn" class="gold-btn" disabled>下一位角色 →</button></div>
-        </div>
-      </div>
-      <div id="introRoster" class="intro-roster"></div>
-    </section>
-
-    <!-- ROLE CARD / PLAYER PERSONAL INFO -->
-    <section id="playerCardScreen" class="screen player-card-screen" hidden>
-      <div class="eyebrow">YOUR CHARACTER FILE</div><h2>這是你的角色劇本</h2>
-      <p class="muted">這是一份以小說方式撰寫的完整角色劇本，包含你的背景、關係、案發當晚經歷及秘密。各輪任務會在對應階段才解鎖。</p>
-      <div id="playerCardContent" class="player-card-content"></div>
-      <button id="beginInvestigationBtn" class="gold-btn">確認角色，開始公開調查 →</button>
-    </section>
-
-    <!-- INVESTIGATION -->
-    <section id="investigationScreen" class="screen investigation-screen" hidden>
-      <div class="investigation-backdrop" id="investigationBg"></div><div class="investigation-shade"></div>
-      <div class="investigation-layout">
-        <div class="phase-header"><div><div class="eyebrow">ACT 2 / ACT 3 PUBLIC INVESTIGATION</div><h2>公開交叉詢問</h2><p id="roundDescription">所有問題與回答都會被在場角色聽見。</p></div><div class="phase-counter" id="turnCounter">TURN 1 / 7</div></div>
-        <div class="character-table" id="characterTable"></div>
-        <div class="interview-panel">
-          <div class="interview-head"><div><div class="eyebrow" id="turnEyebrow">CURRENT INTERVIEW</div><h3 id="turnTitle">等待第一位角色</h3></div><div class="interview-limit" id="turnLimit">最多 3 組問答</div></div>
-          <div class="interview-status" id="interviewStatus">請開始本輪公開詢問。</div>
-          <div class="duel-stage" id="duelStage" aria-live="polite">
-            <article class="duel-person asker-side" id="stageAsker">
-              <div class="duel-role-label">詢問方</div>
-              <div class="duel-portrait-frame"><img id="stageAskerPortrait" src="assets/portraits/face-chen-yuming.webp" alt="詢問角色"></div>
-              <div class="duel-person-meta"><b id="stageAskerName">等待角色</b><small id="stageAskerRole">詢問者</small></div>
-              <div class="duel-bubble" id="askerSpeechBubble"><small id="askerSpeechLabel">等待發言</small><p id="askerSpeechText">角色開始詢問後，對話會在這裡逐字顯示。</p></div>
-              <div class="speaking-indicator">正在發言</div>
-            </article>
-            <div class="duel-center"><span class="duel-emblem">VS</span><small>PUBLIC<br>INTERROGATION</small><div class="duel-round" id="duelRound">ROUND 01</div></div>
-            <article class="duel-person target-side" id="stageTarget">
-              <div class="duel-role-label">回答方</div>
-              <div class="duel-portrait-frame"><img id="stageTargetPortrait" src="assets/portraits/face-dongqing.webp" alt="回答角色"></div>
-              <div class="duel-person-meta"><b id="stageTargetName">等待角色</b><small id="stageTargetRole">回答者</small></div>
-              <div class="duel-bubble" id="targetSpeechBubble"><small id="targetSpeechLabel">等待發言</small><p id="targetSpeechText">被詢問的角色將在這裡回答。</p></div>
-              <div class="speaking-indicator">正在發言</div>
-            </article>
+    <main id="top">
+      <section id="setupView" class="view setup-view">
+        <div class="hero-panel">
+          <div class="hero-copy">
+            <div class="eyebrow">A STORY BUILT ON SECRETS</div>
+            <h1>每個人都有秘密。<br><em>但只有真相不會說謊。</em></h1>
+            <p>民國二十年代末，清河陳宅被濃霧籠罩。婚禮前夕，七位各懷心事的人被聚在同一場儀式之中。有人追尋舊案，有人隱瞞身分，也有人正等待一個永遠不該被揭開的秘密。</p>
+            <div class="hero-tags"><span>民國懸疑</span><span>家族祕史</span><span>固定分支問答</span><span>一位玩家・六位 AI 角色</span></div>
           </div>
-          <div id="exchangeList" class="exchange-list" hidden></div>
-          <div id="playerActionArea" class="player-action-area" hidden></div>
-          <div class="interview-actions"><button id="startTurnBtn" class="gold-btn">開始本位角色詢問 →</button><button id="endInterviewBtn" class="secondary-btn" hidden>提前結束本次詢問</button><button id="nextTurnBtn" class="gold-btn" hidden>下一位角色 →</button></div>
+          <div class="hero-seal">CASE<br><b>001</b><small>清河陳宅</small></div>
         </div>
-        <aside class="investigation-side">
-          <section class="side-card journal-access-card"><div class="side-title">玩家資料 <small>YOUR FILE</small></div><p class="journal-hint">隨時查看自己的角色故事、目前任務、已知資訊及所有公開證詞。</p><button id="openJournalBtn" class="secondary-btn full">📖 我的劇本與筆記</button></section>
-          <section class="side-card"><div class="side-title">公開線索 <small>PUBLIC CLUES</small></div><div id="clueStack" class="clue-stack"></div></section>
-          <section class="side-card"><div class="side-title">公開紀錄 <small>EVERYONE CAN HEAR</small></div><div id="publicTranscript" class="public-transcript"></div></section>
-        </aside>
-      </div>
-    </section>
+        <section class="selection-panel panel">
+          <div class="section-title"><div><div class="eyebrow">YOUR SECRET IDENTITY</div><h2>決定你的角色</h2></div><p>七位涉案者之中，選擇一人作為你的身分。其餘六位將依照各自掌握的劇本與立場參與公開問答。</p></div>
+          <div id="characterGrid" class="character-grid"><div class="loading">正在讀取人物名冊…</div></div>
+          <div class="setup-bottom"><div id="connectionStatus" class="connection-pill"><span class="status-led"></span><span>正在確認後端連線…</span></div><button id="startBtn" class="gold-btn" disabled>選擇角色，進入案件 →</button></div>
+          <p class="fine-print">本版本不呼叫生成式 AI API、不消耗 Token。每位角色的私人劇本與固定問答由 Cloudflare 後端管理；公開網站不包含完整角色秘密。</p>
+        </section>
+      </section>
 
-    <!-- FINAL DISCUSSION -->
-    <section id="finalScreen" class="screen final-screen" hidden>
-      <div class="scene-bg final-bg" id="finalBg"></div><div class="scene-vignette"></div>
-      <div class="final-content">
-        <div class="eyebrow">THE LAST WORD</div><h2>最後陳述</h2><p class="muted">每位角色將根據自己的記憶、任務及公開證詞提出最後立場，並秘密提交自己的投票。</p>
-        <div id="finalStatements" class="final-statements"></div>
-        <button id="generateFinalBtn" class="gold-btn">請所有角色提出最後陳述與投票 →</button>
-        <button id="goVoteBtn" class="gold-btn" hidden>進入最終投票 →</button>
-      </div>
-    </section>
+      <section id="prologueView" class="view hidden">
+        <div class="story-top"><div><div class="eyebrow">CASE 001 · PROLOGUE</div><h2>案件序章</h2></div><div id="prologueCounter" class="story-counter">01 / 04</div></div>
+        <article class="story-card">
+          <div class="story-backdrop"></div>
+          <div class="story-overlay"></div>
+          <div class="story-content"><div id="prologueLocation" class="story-location">江南清河縣・長鹽山腳</div><div id="prologueChapter" class="story-chapter">壹・霧起清河</div><p id="prologueText" class="story-text"></p>
+            <div class="story-footer"><span>旁白　·　NARRATOR</span><button id="prologueNext" class="gold-btn">繼續 →</button></div>
+          </div>
+        </article>
+      </section>
 
-    <!-- VOTING -->
-    <section id="voteScreen" class="screen vote-screen" hidden>
-      <div class="eyebrow">THE VERDICT</div><h2>最後，你認為誰是真正的兇手？</h2><p class="muted">其他角色已各自完成投票。你也必須選出一名嫌疑犯。投票送出後，將公開所有人的選擇。</p>
-      <h3 class="vote-subheading">一、指認惠雯命案的真正兇手</h3>
-      <div class="vote-grid" id="playerVoteChoices"></div>
-      <h3 class="vote-subheading">二、最後抉擇：是否保留《陳氏古法》？</h3>
-      <div class="book-choice-grid" id="bookVoteChoices"></div>
-      <div class="player-vote-note" id="playerGoalNote"></div>
-      <button id="submitVoteBtn" class="gold-btn" disabled>提交兩項最終選擇</button>
-    </section>
+      <section id="castView" class="view hidden">
+        <div class="story-top"><div><div class="eyebrow">THE PEOPLE IN THIS ROOM</div><h2>在場人物</h2><p>先認識每一位與陳宅舊事有所牽連的人。</p></div><div id="castCounter" class="story-counter">01 / 07</div></div>
+        <article class="cast-card panel">
+          <div class="cast-portrait-wrap"><div id="castPortrait" class="cast-portrait"></div><div class="portrait-caption" id="castPortraitCaption">人物剪影</div></div>
+          <div class="cast-details"><div class="eyebrow">CHARACTER INTRODUCTION</div><h2 id="castName">陳聿明</h2><div id="castOccupation" class="cast-occupation">陳宅主人</div><p id="castAction" class="cast-action"></p><blockquote id="castIntro" class="cast-intro"></blockquote><div class="cast-footer"><span id="castAge">40 歲（表面）</span><button id="castNext" class="gold-btn">下一位角色 →</button></div></div>
+        </article>
+      </section>
 
-    <!-- REVEAL -->
-    <section id="revealScreen" class="screen reveal-screen" hidden>
-      <div class="scene-bg reveal-bg" id="revealBg"></div><div class="scene-vignette"></div>
-      <div class="reveal-content"><div class="eyebrow">THE TRUTH HAS BEEN REVEALED</div><h2 id="revealHeading">真相揭曉</h2><div id="revealSummary" class="reveal-summary"></div>
-        <section class="vote-result-section"><h3>兇手指認結果</h3><div id="voteResults" class="vote-results"></div></section>
-        <section class="book-ending-panel"><h3 id="bookEndingHeading">《陳氏古法》去留結果</h3><p id="bookVoteSummary"></p><div id="bookEndingSummary"></div><div id="bookVoteResults" class="book-vote-results"></div></section>
-        <section class="vote-result-section"><h3>案件完整時間線</h3><div id="truthTimeline" class="truth-timeline"></div></section>
-        <section class="vote-result-section"><h3>所有角色的秘密</h3><div id="allSecrets" class="all-secrets"></div></section>
-        <button id="backHomeBtn" class="gold-btn">返回劇本選單 ↗</button>
-      </div>
-    </section>
-  </main>
+      <section id="gameView" class="view hidden">
+        <div class="game-heading"><div><div class="eyebrow">ACT 01 · THE CHEN MANOR</div><h2 id="stageTitle">第一幕｜公開問答</h2></div><div class="player-chip" id="playerChip">玩家：—</div></div>
+        <div class="game-layout">
+          <section class="visual-stage">
+            <div class="scene-label"><span>清河縣・陳宅</span><span>十一月初七　薄霧</span></div>
+            <div class="stage-cast"><div id="speakerPortrait" class="speaker-portrait"></div><div class="speaker-caption"><span id="speakerRole">旁白</span><small id="speakerMood">第一幕・公開問答</small></div></div>
+            <div class="dialogue-panel"><div id="dialogueName" class="dialogue-name">旁白</div><p id="dialogueText" class="dialogue-text">陳宅裡，沒有人願意先開口。</p><div class="dialogue-foot"><span>LOG ▴</span><span id="dialogueStep">第一幕・開始</span></div></div>
+          </section>
+          <aside class="side-panel">
+            <section class="side-card"><div class="side-title">本局資訊</div><div class="side-row"><span>你的角色</span><b id="sideRole">—</b></div><div class="side-row"><span>其他角色</span><b>6 位</b></div><div class="side-row"><span>目前階段</span><b id="sideStage">序章</b></div><button id="scriptBtn" class="side-action">查看我的第一幕劇本 ↗</button></section>
+            <section class="side-card"><div class="side-title">你的第一幕任務</div><ul id="taskList" class="task-list"></ul></section>
+            <section class="side-card log-card"><div class="side-title">公開紀錄 <button id="toggleLogBtn" class="text-btn">收合</button></div><div id="publicLog" class="public-log"></div></section>
+          </aside>
+        </div>
+        <section id="discussionPanel" class="discussion-panel panel hidden">
+          <div class="section-title"><div><div class="eyebrow">PUBLIC CROSS-EXAMINATION</div><h2 id="discussionTitle">公開交叉詢問</h2></div><div id="phaseBadge" class="phase-badge">階段 1 / 3</div></div>
+          <p id="discussionIntro" class="discussion-intro"></p>
+          <div id="questionArea" class="question-area"><div class="loading">正在準備問答…</div></div>
+        </section>
+        <section id="actComplete" class="complete-panel panel hidden"><div class="complete-seal">✓</div><div class="eyebrow">ACT 01 COMPLETE</div><h2>第一幕・問答結束</h2><p>序章、角色介紹、玩家詢問、AI 角色質詢，以及三組角色間的公開交叉詢問均已完成。陳宅的疑雲並未散去，真正的調查將在下一幕展開。</p><button id="backSetupBtn" class="outline-btn">返回角色選擇</button></section>
+      </section>
+    </main>
+    <footer class="footer"><span>《紙妻》民國懸疑互動劇本 · Tokenless v0.2.0</span><span>角色私有劇本由 Cloudflare Worker + D1 管理</span></footer>
+  </div>
 
-  <div id="busyOverlay" class="busy-overlay" hidden><div class="spinner"></div><b id="busyText">角色正在思考……</b><small>角色會依序發言，Token 模式會依照 API 速率限制控制呼叫。</small></div>
-  <div id="toast" class="toast" role="status"></div>
-
-  <script src="./data/cases.js?v=5.0-paperwife-private-worker"></script>
-  <script src="./app.js?v=5.0-paperwife-private-worker"></script>
+  <dialog id="scriptDialog" class="modal">
+    <div class="modal-head"><div><div class="eyebrow">YOUR PRIVATE CHARACTER FILE</div><h2 id="scriptTitle">我的第一幕劇本</h2></div><button class="close-btn" id="closeScript" aria-label="關閉">×</button></div>
+    <div id="scriptContent" class="script-content"></div>
+    <div class="modal-actions"><button class="gold-btn" id="scriptDone">我已閱讀，開始公開討論 →</button></div>
+  </dialog>
+  <script src="app.js?v=0.2.0"></script>
 </body>
 </html>
